@@ -15,6 +15,7 @@ public struct MarkDownEditor: UIViewRepresentable {
 
     @Binding public var text: String
     public var onTextChange: ((String) -> Void)?
+    public var onFocusChange: ((Bool) -> Void)?
 
     private var isScrollEnabled = false
     private var textContainerInset = UIEdgeInsets.zero
@@ -64,6 +65,12 @@ public struct MarkDownEditor: UIViewRepresentable {
     public func lineSpacing(_ spacing: CGFloat) -> MarkDownEditor {
         var editor = self
         editor.configuration.lineSpacing = spacing
+        return editor
+    }
+
+    public func onFocusChange(_ action: @escaping (Bool) -> Void) -> MarkDownEditor {
+        var editor = self
+        editor.onFocusChange = action
         return editor
     }
 
@@ -193,6 +200,14 @@ public struct MarkDownEditor: UIViewRepresentable {
             let markdown = MarkdownProcessor.markdown(from: textView.attributedText)
             parent.text = markdown
             parent.onTextChange?(markdown)
+        }
+
+        public func textViewDidBeginEditing(_ textView: UITextView) {
+            parent.onFocusChange?(true)
+        }
+
+        public func textViewDidEndEditing(_ textView: UITextView) {
+            parent.onFocusChange?(false)
         }
     }
 }
